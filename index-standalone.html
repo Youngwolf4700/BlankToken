@@ -934,7 +934,7 @@
         <!-- Header -->
         <header>
             <div class="logo">
-                <img src="./images/BLANK.png" alt="BLANK Logo" class="logo-image">
+                <img src="images/BLANK.png" alt="BLANK Logo" class="logo-image">
             </div>
             <nav>
                 <a href="#about">About</a>
@@ -1274,7 +1274,7 @@
         <footer>
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="./images/BLANK text final.png" alt="BLANK Logo" class="footer-logo-image">
+                    <img src="images/BLANK text final.png" alt="BLANK Logo" class="footer-logo-image">
                     <p>Born From Nothing!</p>
                 </div>
                 <div class="footer-links">
@@ -1312,6 +1312,27 @@
     </div>
 
     <script>
+        // GitHub Pages path fix
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        const basePath = isGitHubPages ? '/Project-Blank-copy/' : '';
+        
+        // Fix image paths for GitHub Pages
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('img[src^="images/"]');
+            images.forEach(img => {
+                img.src = basePath + img.src;
+            });
+            
+            // Initialize all functionality
+            createParticles();
+            createStars();
+            setupCopyButton();
+            setupFAQ();
+            setupMobileMenu();
+            initTokenChart();
+            initRoadmapAnimation();
+        });
+
         // Token distribution data
         const tokenData = [
             { label: 'Liquidity', percent: 40, color: '#00ffff', color2: '#00c8c8' },
@@ -1661,17 +1682,6 @@
             });
         }
 
-        // Initialize everything
-        document.addEventListener('DOMContentLoaded', () => {
-            createParticles();
-            createStars();
-            setupCopyButton();
-            setupFAQ();
-            setupMobileMenu();
-            initTokenChart(); // Initialize the pie chart
-            initRoadmapAnimation(); // Initialize roadmap animation
-        });
-
         // Initialize Roadmap Animation
         function initRoadmapAnimation() {
             const roadmapItems = document.querySelectorAll('.roadmap-item');
@@ -1712,6 +1722,9 @@
             // Check on resize
             window.addEventListener('resize', checkItems);
         }
+
+        // Initialize everything
+        // (Already handled in DOMContentLoaded above)
     </script>
 </body>
 </html>
