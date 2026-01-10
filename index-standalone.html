@@ -1314,23 +1314,47 @@
     <script>
         // GitHub Pages path fix
         const isGitHubPages = window.location.hostname.includes('github.io');
-        const basePath = isGitHubPages ? '/Project-Blank-copy/' : '';
+        const basePath = isGitHubPages ? '/BlankToken/' : '';
+        
+        // Debug info
+        console.log('GitHub Pages detected:', isGitHubPages);
+        console.log('Base path:', basePath);
+        console.log('Current hostname:', window.location.hostname);
         
         // Fix image paths for GitHub Pages
         document.addEventListener('DOMContentLoaded', function() {
             const images = document.querySelectorAll('img[src^="images/"]');
-            images.forEach(img => {
-                img.src = basePath + img.src;
+            console.log('Found images:', images.length);
+            
+            images.forEach((img, index) => {
+                const newSrc = basePath + img.src;
+                console.log(`Image ${index}: ${img.src} -> ${newSrc}`);
+                img.src = newSrc;
+                
+                // Add error handling for images
+                img.onerror = function() {
+                    console.error('Failed to load image:', this.src);
+                    this.style.display = 'none';
+                };
+                
+                img.onload = function() {
+                    console.log('Successfully loaded image:', this.src);
+                };
             });
             
-            // Initialize all functionality
-            createParticles();
-            createStars();
-            setupCopyButton();
-            setupFAQ();
-            setupMobileMenu();
-            initTokenChart();
-            initRoadmapAnimation();
+            // Initialize all functionality with error handling
+            try {
+                createParticles();
+                createStars();
+                setupCopyButton();
+                setupFAQ();
+                setupMobileMenu();
+                initTokenChart();
+                initRoadmapAnimation();
+                console.log('All functionality initialized successfully');
+            } catch (error) {
+                console.error('Error initializing functionality:', error);
+            }
         });
 
         // Token distribution data
