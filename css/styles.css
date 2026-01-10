@@ -124,6 +124,55 @@ body {
     animation: twinkle 3s infinite;
 }
 
+/* Chart Styles */
+.chart-container {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.chart {
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+
+.chart-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    transition: var(--transition);
+}
+
+.legend-item:hover {
+    transform: translateX(5px);
+    border-color: var(--primary);
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.legend-item span {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
 /* Main Wrapper */
 .main-wrapper {
     max-width: 1400px;
