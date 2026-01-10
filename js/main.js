@@ -90,6 +90,119 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Token distribution data
+    const tokenData = [
+        { label: 'Liquidity', percent: 40, color: '#00ffff', color2: '#00c8c8' },
+        { label: 'Community', percent: 25, color: '#8a2be2', color2: '#6a1cb8' },
+        { label: 'Team', percent: 15, color: '#ff6b6b', color2: '#e64c4c' },
+        { label: 'Ecosystem', percent: 10, color: '#4ecdc4', color2: '#3aa8a0' },
+        { label: 'Marketing', percent: 10, color: '#ffd166', color2: '#e6b84c' }
+    ];
+
+    // Initialize the chart
+    function initTokenChart() {
+        const chartContainer = document.querySelector('.chart-container .chart');
+        if (!chartContainer) return;
+
+        // Create canvas element
+        const canvas = document.createElement('canvas');
+        chartContainer.appendChild(canvas);
+        
+        // Set canvas size to match container
+        const size = Math.min(chartContainer.offsetWidth, chartContainer.offsetHeight);
+        canvas.width = size;
+        canvas.height = size;
+        
+        const ctx = canvas.getContext('2d');
+        const centerX = size / 2;
+        const centerY = size / 2;
+        const radius = Math.min(centerX, centerY) * 0.8;
+        
+        // Draw function
+        function draw() {
+            ctx.clearRect(0, 0, size, size);
+            
+            // Draw chart
+            let startAngle = -Math.PI / 2; // Start from top (-90 degrees)
+            
+            tokenData.forEach((item, index) => {
+                const sliceAngle = (item.percent / 100) * 2 * Math.PI;
+                const endAngle = startAngle + sliceAngle;
+                
+                // Create gradient
+                const gradient = ctx.createLinearGradient(0, 0, size, 0);
+                gradient.addColorStop(0, item.color);
+                gradient.addColorStop(1, item.color2);
+                
+                // Draw segment
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                // Add border
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                startAngle = endAngle;
+            });
+            
+            // Add inner circle for donut effect
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.5, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(10, 10, 20, 0.8)';
+            ctx.fill();
+            
+            // Add total supply in center
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('25M', centerX, centerY - 10);
+            ctx.font = '10px Arial';
+            ctx.fillText('TOTAL SUPPLY', centerX, centerY + 10);
+        }
+        
+        // Create legend
+        function createLegend() {
+            const legendContainer = document.querySelector('.chart-legend');
+            if (!legendContainer) return;
+            
+            legendContainer.innerHTML = ''; // Clear existing legend
+            
+            tokenData.forEach((item, index) => {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                
+                const colorBox = document.createElement('div');
+                colorBox.className = 'legend-color';
+                colorBox.style.background = `linear-gradient(135deg, ${item.color}, ${item.color2})`;
+                
+                const label = document.createElement('span');
+                label.textContent = `${item.label} (${item.percent}%)`;
+                
+                legendItem.appendChild(colorBox);
+                legendItem.appendChild(label);
+                legendContainer.appendChild(legendItem);
+            });
+        }
+        
+        // Initial draw and legend creation
+        draw();
+        createLegend();
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const newSize = Math.min(chartContainer.offsetWidth, chartContainer.offsetHeight);
+            canvas.width = newSize;
+            canvas.height = newSize;
+            draw();
+        });
+    }
+
     // Initialize Roadmap Animation
     function initRoadmapAnimation() {
         const roadmapItems = document.querySelectorAll('.roadmap-item');
@@ -135,6 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initCopyToClipboard();
     createParticles();
     createStars();
+    initTokenChart();
     initRoadmapAnimation();
 });
                                         
