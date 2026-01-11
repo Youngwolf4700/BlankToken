@@ -209,6 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mouse move handler for hover effects
         function handleMouseMove(event) {
+            console.log('Mouse move detected on chart');
             const rect = canvas.getBoundingClientRect();
             const x = event.clientX - rect.left - centerX;
             const y = event.clientY - rect.top - centerY;
@@ -242,6 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         tooltip.style.opacity = '1';
                         tooltip.style.left = (event.clientX - rect.left + 10) + 'px';
                         tooltip.style.top = (event.clientY - rect.top - 30) + 'px';
+                        console.log(`Showing tooltip for: ${item.label} (${item.percent}%)`);
                     } else {
                         tooltip.style.opacity = '0';
                     }
@@ -251,12 +253,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     hoveredIndex = -1;
                     draw();
                     tooltip.style.opacity = '0';
+                    console.log('Mouse left chart area');
                 }
             }
         }
         
         // Mouse leave handler
         function handleMouseLeave() {
+            console.log('Mouse left canvas');
             hoveredIndex = -1;
             draw();
             tooltip.style.opacity = '0';
@@ -265,6 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add event listeners
         canvas.addEventListener('mousemove', handleMouseMove);
         canvas.addEventListener('mouseleave', handleMouseLeave);
+        canvas.addEventListener('mouseenter', () => console.log('Mouse entered canvas'));
         
         // Initial draw
         console.log('Starting initial draw...');
