@@ -101,25 +101,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize the chart
     function initTokenChart() {
+        console.log('Initializing token chart...');
         const chartContainer = document.querySelector('.chart-container .chart');
-        if (!chartContainer) return;
+        if (!chartContainer) {
+            console.error('Chart container not found!');
+            return;
+        }
+        console.log('Chart container found:', chartContainer);
 
         // Create canvas element
         const canvas = document.createElement('canvas');
         chartContainer.appendChild(canvas);
+        console.log('Canvas created and appended');
+        
+        // Create tooltip element
+        const tooltip = document.createElement('div');
+        tooltip.className = 'chart-tooltip';
+        tooltip.style.cssText = `
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        `;
+        chartContainer.appendChild(tooltip);
+        console.log('Tooltip created');
         
         // Set canvas size to match container
         const size = Math.min(chartContainer.offsetWidth, chartContainer.offsetHeight);
         canvas.width = size;
         canvas.height = size;
+        console.log('Canvas size set to:', size);
         
         const ctx = canvas.getContext('2d');
         const centerX = size / 2;
         const centerY = size / 2;
         const radius = Math.min(centerX, centerY) * 0.8;
+        console.log('Chart dimensions calculated');
+        
+        // Track hovered segment
+        let hoveredIndex = -1;
         
         // Draw function
         function draw() {
+            console.log('Drawing chart...');
             ctx.clearRect(0, 0, size, size);
             
             // Draw chart
@@ -142,9 +174,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.fillStyle = gradient;
                 ctx.fill();
                 
-                // Add border
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.lineWidth = 1;
+                // Add hover effect
+                if (index === hoveredIndex) {
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 3;
+                    ctx.shadowColor = item.color;
+                    ctx.shadowBlur = 10;
+                } else {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.lineWidth = 1;
+                    ctx.shadowBlur = 0;
+                }
                 ctx.stroke();
                 
                 startAngle = endAngle;
@@ -164,35 +204,72 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.fillText('25M', centerX, centerY - 10);
             ctx.font = '10px Arial';
             ctx.fillText('TOTAL SUPPLY', centerX, centerY + 10);
+            console.log('Chart drawing completed');
         }
         
-        // Create legend
-        function createLegend() {
-            const legendContainer = document.querySelector('.chart-legend');
-            if (!legendContainer) return;
+        // Mouse move handler for hover effects
+        function handleMouseMove(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left - centerX;
+            const y = event.clientY - rect.top - centerY;
+            const distance = Math.sqrt(x * x + y * y);
             
-            legendContainer.innerHTML = ''; // Clear existing legend
-            
-            tokenData.forEach((item, index) => {
-                const legendItem = document.createElement('div');
-                legendItem.className = 'legend-item';
+            // Check if mouse is within the donut chart area
+            if (distance > radius * 0.5 && distance < radius) {
+                const angle = Math.atan2(y, x);
+                let normalizedAngle = (angle + Math.PI * 2.5) % (Math.PI * 2);
                 
-                const colorBox = document.createElement('div');
-                colorBox.className = 'legend-color';
-                colorBox.style.background = `linear-gradient(135deg, ${item.color}, ${item.color2})`;
+                let cumulativeAngle = 0;
+                let foundIndex = -1;
                 
-                const label = document.createElement('span');
-                label.textContent = `${item.label} (${item.percent}%)`;
+                for (let i = 0; i < tokenData.length; i++) {
+                    const sliceAngle = (tokenData[i].percent / 100) * 2 * Math.PI;
+                    if (normalizedAngle >= cumulativeAngle && normalizedAngle < cumulativeAngle + sliceAngle) {
+                        foundIndex = i;
+                        break;
+                    }
+                    cumulativeAngle += sliceAngle;
+                }
                 
-                legendItem.appendChild(colorBox);
-                legendItem.appendChild(label);
-                legendContainer.appendChild(legendItem);
-            });
+                if (foundIndex !== hoveredIndex) {
+                    hoveredIndex = foundIndex;
+                    draw();
+                    
+                    // Show tooltip
+                    if (foundIndex !== -1) {
+                        const item = tokenData[foundIndex];
+                        tooltip.innerHTML = `<strong>${item.label}</strong><br>${item.percent}%`;
+                        tooltip.style.opacity = '1';
+                        tooltip.style.left = (event.clientX - rect.left + 10) + 'px';
+                        tooltip.style.top = (event.clientY - rect.top - 30) + 'px';
+                    } else {
+                        tooltip.style.opacity = '0';
+                    }
+                }
+            } else {
+                if (hoveredIndex !== -1) {
+                    hoveredIndex = -1;
+                    draw();
+                    tooltip.style.opacity = '0';
+                }
+            }
         }
         
-        // Initial draw and legend creation
+        // Mouse leave handler
+        function handleMouseLeave() {
+            hoveredIndex = -1;
+            draw();
+            tooltip.style.opacity = '0';
+        }
+        
+        // Add event listeners
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseleave', handleMouseLeave);
+        
+        // Initial draw
+        console.log('Starting initial draw...');
         draw();
-        createLegend();
+        console.log('Chart initialization completed');
         
         // Handle window resize
         window.addEventListener('resize', function() {
@@ -245,11 +322,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize all functions
+    console.log('Initializing all functions...');
     initCopyToClipboard();
+    console.log('Copy to clipboard initialized');
     createParticles();
+    console.log('Particles created');
     createStars();
+    console.log('Stars created');
     initTokenChart();
+    console.log('Token chart initialized');
     initRoadmapAnimation();
+    console.log('Roadmap animation initialized');
+    console.log('All functions initialized successfully');
 });
                                         
                                 
